@@ -24,7 +24,7 @@ services:
       - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
       - WORDPRESS_DB_NAME=wordpress
     volumes:
-      - wordpress:/var/www/html
+      - ./wordpress-code:/var/www/html
     networks:
       - app-network
 
@@ -37,13 +37,28 @@ services:
     ports:
       - "80:80"
     volumes:
-      - wordpress:/var/www/html
+      - ./wordpress-code:/var/www/html
       - ./nginx-conf:/etc/nginx/conf.d
     networks:
       - app-network
 
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin:5.2.1-fpm-alpine
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_ARBITRARY=1
+    ports:
+      - "8325:80"
+    networks:
+      - app-network
+      
 volumes:
-  wordpress:
+  # wordpress:
   dbdata:
 
 networks:
